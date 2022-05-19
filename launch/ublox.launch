@@ -21,8 +21,8 @@
 
     <!-- NTRIP -->
     <arg name="use_ntrip" default="false"/>
-    <arg name="navhpposllh_topic" doc="The incoming navhpposllh topic." default="/navhpposllh"/>
-    <arg name="nmea_topic" doc="The outgoing nmea topic." default="/nmea"/>
+    <arg name="navhpposllh_topic" doc="The incoming navhpposllh topic." default="/ublox_position_receiver/navhpposllh"/>
+    <arg name="nmea_topic" doc="The outgoing nmea topic." default="/ntrip_client/nmea"/>
 
     <arg name="ntrip_host" default="www.swipos.ch" />
     <arg name="ntrip_port" default="2101" />
@@ -38,6 +38,7 @@
           clear_params="$(arg clear_params)"
           respawn="$(arg respawn)"
           respawn_delay="$(arg respawn_delay)">
+        <remap from="/rtcm" to="/ublox_position_receiver/rtcm"/>
         <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
     </node>
 
@@ -48,34 +49,44 @@
               clear_params="$(arg clear_params)"
               respawn="$(arg respawn)"
               respawn_delay="$(arg respawn_delay)">
+            <remap from="/rtcm" to="/ublox_moving_baseline_receiver/rtcm"/>
             <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
         </node>
     </group>
 
-    <group ns="ntrip" if="$(eval arg('use_ntrip'))">
-        <!-- This node creaetes NMEA $GPGGA messages from u-blox navhpposllh to send to the NTRIP caster -->
-        <node name="ublox2nmea" pkg="ublox_utils" type="ublox2nmea"
-              output="$(arg output)"
-              clear_params="$(arg clear_params)"
-              respawn="$(arg respawn)"
-              respawn_delay="$(arg respawn_delay)">
-            <remap from="/navhpposllh" to="$(arg navhpposllh_topic)"/>
-            <remap from="/nmea" to="$(arg nmea_topic)"/>
-        </node>
+    <!-- This node creaetes NMEA $GPGGA messages from u-blox navhpposllh to send to the NTRIP caster -->
+    <node name="ublox2nmea" pkg="ublox_utils" type="ublox2nmea"
+          output="$(arg output)"
+          clear_params="$(arg clear_params)"
+          respawn="$(arg respawn)"
+          respawn_delay="$(arg respawn_delay)">
+        <remap from="/navhpposllh" to="$(arg navhpposllh_topic)"/>
+        <remap from="/nmea" to="$(arg nmea_topic)"/>
+    </node>
 
-        <!-- This node transforms mavros/rtcm to rtcm/Message -->
-        <node name="rtcm_transform" pkg="topic_tools" type="transform" output="screen"
-              args="/ntrip_client/rtcm /rtcm rtcm_msgs/Message 'rtcm_msgs.msg.Message(header=m.header, message=m.data)' --import rtcm_msgs --wait-for-start"/>
+    <!-- This node transforms mavros/rtcm to rtcm/Message -->
+    <node name="rtcm_transform" pkg="topic_tools" type="transform" output="screen"
+          args="/ntrip_client/rtcm /ublox_position_receiver/rtcm rtcm_msgs/Message 'rtcm_msgs.msg.Message(header=m.header, message=m.data)' --import rtcm_msgs --wait-for-start"/>
 
-        <!-- This node relays the current NMEA $GPGGA position to the NTRIP caster and returns the RTCM corrections -->
-        <include file="$(find ntrip_client)/launch/ntrip_client.launch">
-            <arg name="host" value="$(arg ntrip_host)" />
-            <arg name="port" value="$(arg ntrip_port)" />
-            <arg name="mountpoint" value="$(arg ntrip_mountpoint)" />
-            <arg name="ntrip_version" value="$(arg ntrip_version)" />
-            <arg name="authenticate" value="$(arg ntrip_authentificate)" />
-            <arg name="username" value="$(arg ntrip_username)" />
-            <arg name="password" value="$(arg ntrip_password)" />
-        </include>
-    </group>
+    <!-- This node relays the current NMEA $GPGGA position to the NTRIP caster and returns the RTCM corrections -->
+    <node name="ntrip_client" pkg="ntrip_client" type="ntrip_ros.py"
+          output="$(arg output)"
+          clear_params="$(arg clear_params)"
+          respawn="$(arg respawn)"
+          respawn_delay="$(arg respawn_delay)">
+        <param name="host"       value="$(arg ntrip_host)" />
+        <param name="port"       value="$(arg ntrip_port)" />
+        <param name="mountpoint" value="$(arg ntrip_mountpoint)" />
+
+        <param name="ntrip_version" value="$(arg ntrip_version)" />
+
+        <param name="authenticate" value="$(arg ntrip_authentificate)" />
+        <param name="username" value="$(arg ntrip_username)" />
+        <param name="password" value="$(arg ntrip_password)" />
+
+        <param name="rtcm_frame_id" value="$(arg frame_id_position_receiver)" />
+
+        <remap from="/rtcm" to="/ntrip_client/rtcm" />
+        <remap from="/nmea" to="/ntrip_client/nmea" />
+    </node>
 </launch>
