@@ -1,0 +1,9 @@
+config_on_startup: false
+publish:
+  all: true
+  esf: true
+gnss:
+  gps: true
+  glonass: true
+  galileo: true
+  beidou: true

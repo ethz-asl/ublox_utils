@@ -1,0 +1,78 @@
+<launch>
+    <!-- General settings -->
+    <arg name="ns" default=""/>
+    <arg name="output" default="screen"/>
+    <arg name="respawn" default="true"/>
+    <arg name="respawn_delay" default="30"/>
+    <arg name="clear_params" default="true"/>
+
+    <!-- u-blox position receiver -->
+    <arg name="device_position_receiver" default="/dev/ttyACM0"/>
+    <arg name="frame_id_position_receiver" default="gnss"/>
+
+    <!-- u-blox moving baseline receiver -->
+    <arg name="use_moving_baseline" default="false"/>
+    <arg name="device_moving_baseline_receiver" default="/dev/ttyACM1"/>
+    <arg name="frame_id_moving_baseline_receiver" default="position_receiver"/>
+
+    <!-- u-blox general -->
+    <arg name="param_file_name" doc="name of param file, e.g. rover" default="zed_f9p"/>
+    <arg name="param_file_dir" doc="directory to look for $(arg param_file_name).yaml"
+         default="$(find ublox_utils)/config"/>
+
+    <!-- NTRIP -->
+    <arg name="use_ntrip" default="false"/>
+    <arg name="navhpposllh_topic" doc="The incoming navhpposllh topic." default="/navhpposllh"/>
+    <arg name="nmea_topic" doc="The outgoing nmea topic." default="/nmea"/>
+
+    <arg name="ntrip_host" default="www.swipos.ch" />
+    <arg name="ntrip_port" default="2101" />
+    <arg name="ntrip_mountpoint" default="MSM_GISGEO_LV95LHN95" />
+    <arg name="ntrip_username" />
+    <arg name="ntrip_password" />
+
+
+    <group ns="$(arg ns)">
+
+        <node pkg="ublox_gps" type="ublox_gps" name="ublox_position_receiver"
+              output="$(arg output)"
+              clear_params="$(arg clear_params)"
+              respawn="$(arg respawn)"
+              respawn_delay="$(arg respawn_delay)">
+            <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+        </node>
+
+        <group if="$(eval arg('use_moving_baseline'))">
+            <node pkg="ublox_gps" type="ublox_gps" name="ublox_moving_baseline_receiver"
+                  output="$(arg output)"
+                  clear_params="$(arg clear_params)"
+                  respawn="$(arg respawn)"
+                  respawn_delay="$(arg respawn_delay)">
+                <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+            </node>
+        </group>
+
+        <group ns="ntrip" if="$(eval arg('use_ntrip'))">
+            <node name="ublox2nmea" pkg="ublox_utils" type="ublox2nmea"
+                  output="$(arg output)"
+                  clear_params="$(arg clear_params)"
+                  respawn="$(arg respawn)"
+                  respawn_delay="$(arg respawn_delay)">
+                <remap from="/navhpposllh" to="$(arg navhpposllh_topic)"/>
+                <remap from="/nmea" to="$(arg nmea_topic)"/>
+            </node>
+
+            <!-- This node transforms mavros/rtcm to rtcm/Message -->
+            <node name="rtcm_transform" pkg="topic_tools" type="transform" output="screen"
+                  args="/ntrip_client/rtcm /rtcm rtcm_msgs/Message 'rtcm_msgs.msg.Message(header=m.header, message=m.data)' --import rtcm_msgs --wait-for-start"/>
+
+            <include file="$(find ntrip_client)/launch/ntrip_client.launch">
+                <arg name="host" value="$(arg ntrip_host)" />
+                <arg name="port" value="$(arg ntrip_port)" />
+                <arg name="mountpoint" value="$(arg ntrip_mountpoint)" />
+                <arg name="username" value="$(arg ntrip_username)" />
+                <arg name="password" value="$(arg ntrip_password)" />
+            </include>
+        </group>
+    </group>
+</launch>
