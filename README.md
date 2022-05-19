@@ -93,7 +93,7 @@ roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_nt
 ```
 
 The rosgraph should look like this:
-![Rosgaph of NTRIP connection.](https://user-images.githubusercontent.com/11293852/169337182-94ccd723-9387-4bce-bb5e-4d15cb903c9f.png)
+![Rosgaph of NTRIP connection.](https://user-images.githubusercontent.com/11293852/169337693-09c338d6-1e9d-416b-b12d-9ae0bfa735db.png)
 
 ### Launch both receivers with NTRIP
 ```
