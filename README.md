@@ -2,9 +2,9 @@
 Repository with ROS tools for the u-blox RTK receiver.
 
 ## Table of Contents
-1. [Installation](#Installation)
-2. [Hardware Setup](#HardwareSetup)
-3. [ROS Sensor Launch](#ROSSensorLaunch)
+1. [Installation](#installation)
+2. [Hardware Setup](#hardware-setup)
+3. [ROS Sensor Launch](#ros-sensor-launch)
 
 ## Installation
 ```
