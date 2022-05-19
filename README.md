@@ -64,17 +64,32 @@ For some, e.g., NTRIP corrections or Tallysman antennas research discounts may a
 |  5  |    2    | Coaxial SMA to SMA (500mm)                   | 415-0031-MM500  | digikey   | J10300-ND           | CHF 16.-        | CHF 32.-        |
 
 ## ROS Sensor Launch
+[ublox.launch](./launch/ublox.launch) provides the launch file to start the u-blox receivers ROS interface.
+### Single receiver
+The default startup with a single receiver is
+```
+roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0
+```
 
+### Dual receiver
+At first use, setup the two receivers.
+[ZED-FP9 Moving base applications, p.16](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf) shows the procedure for 8Hz position and moving baseline estimates.
+1. Set measurement rate to 8Hz on both receivers.
+2. Set UART2 Baudrate to 460800 on both receivers.
+3. Activate RTCM messages on UART2 on position receiver.
+4. You do not need to change output messages on moving baseline receiver. It will automatically process RTCM from UART2 and output the heading information via USB.
+5. **Note** Make sure to save settings to RAM.
 
+To startup the second receiver with moving baseline estimates run
+```
+roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_moving_baseline:=true device_moving_baseline_receiver:=/dev/ttyACM1
+```
+**Note**: You may want to find a smart way to allocate the device ID.
 
-## Moving Baseline Setup
-## NTRIP Corrections
+### NTRIP corrections
 We use the [swipos-GIS/GEO](https://www.swisstopo.admin.ch/de/geodata/geoservices/swipos/swipos-dienste/swipos-gisgeo.html) caster in conjunction with the [ROS ntrip client](http://wiki.ros.org/ntrip_client).
-The following sequence will start the connection.
+Our [ublox2nmea](src/ublox2nmea.cc) node makes sure the caster receives the current VRS location.
+It receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the u-blox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
 ```
-
+roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
 ```
-
-# fix2nmea
-This ROS node receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the ublox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
-This sentence can be used in conjunction with [ROS ntrip client](http://wiki.ros.org/ntrip_client) to pipe the [RTCM correction messages](https://github.com/tilk/rtcm_msgs/blob/master/msg/Message.msg) to the [ublox ROS driver](https://github.com/KumarRobotics/ublox).
