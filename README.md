@@ -91,3 +91,8 @@ It receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
 ```
+
+### Launch both receivers with NTRIP
+```
+roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_moving_baseline:=true device_moving_baseline_receiver:=/dev/ttyACM1 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
+```
