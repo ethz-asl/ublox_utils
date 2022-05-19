@@ -38,7 +38,7 @@ The following considerations should be taken into account:
 - **Known phase center position** with respect to rover body frame (see r_BP and r_BM in Figure below).
 - Moving baseline antenna **at least 20cm** distanced from moving base antenna (see [ZED-FP9 Moving base applications, p.7](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf)).
 
-![Hardware GNSS setup.]()
+![Hardware GNSS setup.](https://user-images.githubusercontent.com/11293852/169337168-dd9f23a8-5c68-41e9-bf57-185111bd45fb.png)
 
 ### Electronics
 The NTRIP setup does not require a base station.
@@ -46,7 +46,7 @@ Instead the corrections are provided by an NTRIP caster online.
 The wiring is shown in the Figure below.
 In case of a moving baseline setup correction from the moving base receiver to the moving baseline receiver will be sent via UART2.
 
-![Electronic wiring of dual RTK setup.]()
+![Electronic wiring of dual RTK setup.](https://user-images.githubusercontent.com/11293852/169337161-7a531299-0cdd-4294-901e-e4295f50c316.png)
 
 ### Part List
 This is the part list for the standard moving baseline setup above.
@@ -91,6 +91,9 @@ It receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
 ```
+
+The rosgraph should look like this:
+![Rosgaph of NTRIP connection.](https://user-images.githubusercontent.com/11293852/169337182-94ccd723-9387-4bce-bb5e-4d15cb903c9f.png)
 
 ### Launch both receivers with NTRIP
 ```
