@@ -2,15 +2,33 @@
 Repository with ROS tools for the u-blox RTK receiver.
 
 ## Table of Contents
-1. [Hardware Setup](#Hardware Setup)
-2. [ROS Sensor Launch](#ROS Sensor Launch)
-3. [Moving Baseline Firmware Setup](#Moving Baseline Setup)
-4. [NTRIP Corrections](#NTRIP Corrections)
+1. [Installation](#Installation)
+2. [Hardware Setup](#Hardware Setup)
+3. [ROS Sensor Launch](#ROS Sensor Launch)
+4. [Moving Baseline Firmware Setup](#Moving Baseline Setup)
+5. [NTRIP Corrections](#NTRIP Corrections)
 
-5. This includes:
-- hardware and firmware setup instructions for single and moving baseline receivers
-- ROS node [fix2nmea](./ublox_utils/launch/fix2nmea.launch) to create $GPGGA message from ublox status and active NTRIP communication
-- ROS [launch file](./ublox_utils/launch/ublox.launch) to start single and moving baseline receiver
+## Installation
+```
+source /opt/ros/noetic/setup.bash
+export ROS_VERSION=`rosversion -d`
+
+sudo apt install -y python3-catkin-tools \
+  ros-$ROS_VERSION-ublox \
+  ros-$ROS_VERSION-ntrip-client \
+  ros-$ROS_VERSION-nmea-msgs \
+  ros-$ROS_VERSION-mavros-msgs \
+  ros-$ROS_VERSION-rtcm-msgs
+  
+cd ~
+mkdir -p catkin_ws/src
+cd catkin_ws
+catkin init
+catkin config --extend /opt/ros/noetic
+cd ~/catkin_ws/src
+git clone git@github.com:ethz-asl/ublox_utils.git
+catkin build
+```
 
 ## Hardware Setup
 This section describes the hardware setup with one or two receivers on the rover.
@@ -46,6 +64,9 @@ For some, e.g., NTRIP corrections or Tallysman antennas research discounts may a
 |  5  |    2    | Coaxial SMA to SMA (500mm)                   | 415-0031-MM500  | digikey   | J10300-ND           | CHF 16.-        | CHF 32.-        |
 
 ## ROS Sensor Launch
+
+
+
 ## Moving Baseline Setup
 ## NTRIP Corrections
 We use the [swipos-GIS/GEO](https://www.swisstopo.admin.ch/de/geodata/geoservices/swipos/swipos-dienste/swipos-gisgeo.html) caster in conjunction with the [ROS ntrip client](http://wiki.ros.org/ntrip_client).
@@ -55,6 +76,5 @@ The following sequence will start the connection.
 ```
 
 # fix2nmea
-This ROS node receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the ublox receiver and outputs it as [NMEA $GPGGA sentence](  ros::Subscriber navsatfix_sub_;
-).
+This ROS node receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the ublox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
 This sentence can be used in conjunction with [ROS ntrip client](http://wiki.ros.org/ntrip_client) to pipe the [RTCM correction messages](https://github.com/tilk/rtcm_msgs/blob/master/msg/Message.msg) to the [ublox ROS driver](https://github.com/KumarRobotics/ublox).
