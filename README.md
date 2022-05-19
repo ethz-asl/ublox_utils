@@ -3,8 +3,14 @@ Repository with ROS tools for the u-blox RTK receiver.
 
 ## Table of Contents
 1. [Installation](#installation)
-2. [Hardware Setup](#hardware-setup)
-3. [ROS Sensor Launch](#ros-sensor-launch)
+2. [Hardware Setup](#hardware-setup)  
+     1. [Electronics](#electronics)
+     2. [Part List](#part-list)  
+4. [ROS Sensor Launch](#ros-sensor-launch)  
+     1. [Single Receiver](#single-receiver)
+     2. [Dual Receivers](#dual-receivers)
+     3. [NTRIP Corrections](#ntrip-corrections)
+     4. [Dual Receivers with NTRIP](#dual-receivers-with-ntrip)
 
 ## Installation
 ```
@@ -63,13 +69,14 @@ For some, e.g., NTRIP corrections or Tallysman antennas research discounts may a
 
 ## ROS Sensor Launch
 [ublox.launch](./launch/ublox.launch) provides the launch file to start the u-blox receivers ROS interface.
-### Single receiver
+
+### Single Receiver
 The default startup with a single receiver is
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0
 ```
 
-### Dual receiver
+### Dual Receivers
 At first use, setup the two receivers.
 [ZED-FP9 Moving base applications, p.16](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf) shows the procedure for 8Hz position and moving baseline estimates.
 1. Set measurement rate to 8Hz on both receivers.
@@ -84,7 +91,7 @@ roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_mo
 ```
 **Note**: You may want to find a smart way to allocate the device ID.
 
-### NTRIP corrections
+### NTRIP Corrections
 We use the [swipos-GIS/GEO](https://www.swisstopo.admin.ch/de/geodata/geoservices/swipos/swipos-dienste/swipos-gisgeo.html) caster in conjunction with the [ROS ntrip client](http://wiki.ros.org/ntrip_client).
 Our [ublox2nmea](src/ublox2nmea.cc) node makes sure the caster receives the current VRS location.
 It receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the u-blox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
@@ -95,7 +102,7 @@ roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_nt
 The rosgraph should look like this:
 ![Rosgaph of NTRIP connection.](https://user-images.githubusercontent.com/11293852/169337693-09c338d6-1e9d-416b-b12d-9ae0bfa735db.png)
 
-### Launch both receivers with NTRIP
+### Dual Receivers with NTRIP
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_moving_baseline:=true device_moving_baseline_receiver:=/dev/ttyACM1 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
 ```
