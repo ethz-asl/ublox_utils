@@ -72,6 +72,12 @@ For some, e.g., NTRIP corrections or Tallysman antennas research discounts may a
 The latest tested firmware was **1.32** on ZED-F9P receiver. 
 To update the firmware follow the [sparkfun tutorial](https://learn.sparkfun.com/tutorials/how-to-upgrade-firmware-of-a-u-blox-gnss-receiver).
 
+When using a dual receiver setup update the configuration of the [moving base receiver](config/moving_base.txt) and [rover receiver](config/rover.txt).
+The configuration is elaborated in [ZED-FP9 Moving base applications, p.16](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf).
+To flash the configuration go to u-center and select `View->Generation 9 Configuration View->Advanced Configuration->Load from file...->Send config changes`
+**Note** If you are only using a single rover, the default config is fine.
+
+To revert to the default config select `View->Messages view->UBX->CFG->CFG->Revert to default configuration->Send`.
 ## ROS Sensor Launch
 [ublox.launch](./launch/ublox.launch) provides the launch file to start the u-blox receivers ROS interface.
 
@@ -82,13 +88,7 @@ roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0
 ```
 
 ### Dual Receivers
-At first use, setup the two receivers.
-[ZED-FP9 Moving base applications, p.16](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf) shows the procedure for 8Hz position and moving baseline estimates.
-1. Set measurement rate to 8Hz on both receivers.
-2. Set UART2 Baudrate to 460800 on both receivers.
-3. Activate RTCM messages on UART2 on position receiver.
-4. You do not need to change output messages on moving baseline receiver. It will automatically process RTCM from UART2 and output the heading information via USB.
-5. **Note** Make sure to save settings to RAM.
+At first use, setup the [firmware][#firmware].
 
 To startup the second receiver with moving baseline estimates run
 ```
