@@ -50,7 +50,7 @@ The following considerations should be taken into account:
 The NTRIP setup does not require a base station.
 Instead the corrections are provided by an NTRIP caster online.
 The wiring is shown in the Figure below.
-In case of a moving baseline setup correction from the moving base receiver to the rover will be sent via UART2.
+In case of a moving baseline setup, corrections from the moving base receiver (Receiver 1) will be sent to the rover (Receiver 2) via UART2.
 
 ![Electronic wiring of dual RTK setup.](https://user-images.githubusercontent.com/11293852/169337161-7a531299-0cdd-4294-901e-e4295f50c316.png)
 
