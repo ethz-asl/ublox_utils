@@ -1,0 +1,98 @@
+<launch>
+    <!-- General settings -->
+    <arg name="output" default="screen"/>
+    <arg name="respawn" default="true"/>
+    <arg name="respawn_delay" default="30"/>
+    <arg name="clear_params" default="true"/>
+
+    <!-- u-blox position receiver -->
+    <arg name="device_position_receiver" default="/dev/ttyACM0"/>
+    <arg name="frame_id_position_receiver" default="gnss"/>
+
+    <!-- u-blox moving baseline receiver -->
+    <arg name="use_moving_baseline" default="false"/>
+    <arg name="device_moving_baseline_receiver" default="/dev/ttyACM1"/>
+    <arg name="frame_id_moving_baseline_receiver" default="position_receiver"/>
+
+    <!-- u-blox general -->
+    <arg name="param_file_name" doc="name of param file, e.g. rover" default="zed_f9p"/>
+    <arg name="param_file_dir" doc="directory to look for $(arg param_file_name).yaml"
+         default="$(find ublox_utils)/config"/>
+
+    <!-- NTRIP -->
+    <arg name="use_ntrip" default="false"/>
+    <arg name="navpvt_topic" doc="The incoming navpvt topic." default="/ublox_position_receiver/navpvt"/>
+    <arg name="nmea_topic" doc="The outgoing nmea topic." default="/ntrip_client/nmea"/>
+
+    <arg name="ntrip_host" default="www.swipos.ch" />
+    <arg name="ntrip_port" default="2101" />
+    <arg name="ntrip_mountpoint" default="MSM_GISGEO_LV95LHN95" />
+    <arg name="ntrip_version" default="" />
+    <arg name="ntrip_authentificate" default="true" />
+    <arg name="ntrip_username" />
+    <arg name="ntrip_password" />
+
+    <!-- The ublox position receiver -->
+    <node pkg="ublox_gps" type="ublox_gps" name="ublox_position_receiver"
+          output="$(arg output)"
+          clear_params="$(arg clear_params)"
+          respawn="$(arg respawn)"
+          respawn_delay="$(arg respawn_delay)">
+        <remap from="/rtcm" to="/ublox_position_receiver/rtcm"/>
+        <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+        <param name="device" value="$(arg device_position_receiver)"/>
+    </node>
+
+    <!-- The second optional ublox moving baseline receiver -->
+    <group if="$(eval arg('use_moving_baseline'))">
+        <node pkg="ublox_gps" type="ublox_gps" name="ublox_moving_baseline_receiver"
+              output="$(arg output)"
+              clear_params="$(arg clear_params)"
+              respawn="$(arg respawn)"
+              respawn_delay="$(arg respawn_delay)">
+            <remap from="/rtcm" to="/ublox_moving_baseline_receiver/rtcm"/>
+            <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+            <param name="device" value="$(arg device_moving_baseline_receiver)"/>
+            <param name="publish/nav/heading" value="true"/>
+        </node>
+    </group>
+
+
+    <group if="$(eval arg('use_ntrip'))">
+    <!-- This node creaetes NMEA $GPGGA messages from u-blox navpvt to send to the NTRIP caster -->
+    <node name="ublox2nmea" pkg="ublox_utils" type="ublox2nmea"
+          output="$(arg output)"
+          clear_params="$(arg clear_params)"
+          respawn="$(arg respawn)"
+          respawn_delay="$(arg respawn_delay)">
+        <remap from="/navpvt" to="$(arg navpvt_topic)"/>
+        <remap from="/nmea" to="$(arg nmea_topic)"/>
+    </node>
+
+    <!-- This node transforms mavros/rtcm to rtcm/Message -->
+    <node name="rtcm_transform" pkg="topic_tools" type="transform" output="screen"
+          args="/ntrip_client/rtcm /ublox_position_receiver/rtcm rtcm_msgs/Message 'rtcm_msgs.msg.Message(header=m.header, message=m.data)' --import rtcm_msgs --wait-for-start"/>
+
+    <!-- This node relays the current NMEA $GPGGA position to the NTRIP caster and returns the RTCM corrections -->
+    <node name="ntrip_client" pkg="ntrip_client" type="ntrip_ros.py"
+          output="$(arg output)"
+          clear_params="$(arg clear_params)"
+          respawn="$(arg respawn)"
+          respawn_delay="$(arg respawn_delay)">
+        <param name="host"       value="$(arg ntrip_host)" />
+        <param name="port"       value="$(arg ntrip_port)" />
+        <param name="mountpoint" value="$(arg ntrip_mountpoint)" />
+
+        <param name="ntrip_version" value="$(arg ntrip_version)" />
+
+        <param name="authenticate" value="$(arg ntrip_authentificate)" />
+        <param name="username" value="$(arg ntrip_username)" />
+        <param name="password" value="$(arg ntrip_password)" />
+
+        <param name="rtcm_frame_id" value="$(arg frame_id_position_receiver)" />
+
+        <remap from="/rtcm" to="/ntrip_client/rtcm" />
+        <remap from="/nmea" to="/ntrip_client/nmea" />
+    </node>
+    </group>
+</launch>

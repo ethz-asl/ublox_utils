@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>ublox_utils</name>
+    <version>1.0.0</version>
+    <description>
+        Repository with ROS tools for the u-blox RTK receiver.
+    </description>
+    <author>Rik Bähnemann</author>
+    <maintainer email="brik@ethz.ch">Rik Bähnemann</maintainer>
+
+    <license>MIT</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <build_depend>nmea_msgs</build_depend>
+    <build_depend>ublox_msgs</build_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>nmea_msgs</exec_depend>
+    <exec_depend>ublox_msgs</exec_depend>
+    <exec_depend>mavros_msgs</exec_depend>
+    <exec_depend>rtcm_msgs</exec_depend>
+    <exec_depend>ntrip_client</exec_depend>
+
+</package>

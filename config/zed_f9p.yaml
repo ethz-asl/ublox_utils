@@ -1,0 +1,15 @@
+config_on_startup: false
+publish:
+  nav:
+    relposned: true
+    status: true
+    pvt: true
+  rxm:
+    rtcm: true
+gnss:
+  gps: true
+  glonass: true
+  galileo: true
+  beidou: true
+dynamic_model: airborne1
+debug: 0

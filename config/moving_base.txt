@@ -1,0 +1,23 @@
+# Config changes format version 1.0
+# created by u-center version 22.02 at 19:07:31 on Friday, 20 May 2022
+[del]
+[set]
+  RAM CFG-RATE-MEAS        0x7d                 # write value 125  0x7d            to item id 0x30210001 in layer 0
+Flash CFG-RATE-MEAS        0x7d                 # write value 125  0x7d            to item id 0x30210001 in layer 2
+  RAM CFG-UART1-BAUDRATE   0x70800              # write value 460800  0x70800      to item id 0x40520001 in layer 0
+Flash CFG-UART1-BAUDRATE   0x70800              # write value 460800  0x70800      to item id 0x40520001 in layer 2
+  RAM CFG-UART2-BAUDRATE   0x70800              # write value 460800  0x70800      to item id 0x40530001 in layer 0
+Flash CFG-UART2-BAUDRATE   0x70800              # write value 460800  0x70800      to item id 0x40530001 in layer 2
+  RAM CFG-MSGOUT-RTCM_3X_TYPE1074_UART2 0x1                  # write value 1  0x1               to item id 0x20910360 i
+Flash CFG-MSGOUT-RTCM_3X_TYPE1074_UART2 0x1                  # write value 1  0x1               to item id 0x20910360 i
+  RAM CFG-MSGOUT-RTCM_3X_TYPE1084_UART2 0x1                  # write value 1  0x1               to item id 0x20910365 i
+Flash CFG-MSGOUT-RTCM_3X_TYPE1084_UART2 0x1                  # write value 1  0x1               to item id 0x20910365 i
+  RAM CFG-MSGOUT-RTCM_3X_TYPE1094_UART2 0x1                  # write value 1  0x1               to item id 0x2091036a i
+Flash CFG-MSGOUT-RTCM_3X_TYPE1094_UART2 0x1                  # write value 1  0x1               to item id 0x2091036a i
+  RAM CFG-MSGOUT-RTCM_3X_TYPE1124_UART2 0x1                  # write value 1  0x1               to item id 0x2091036f i
+Flash CFG-MSGOUT-RTCM_3X_TYPE1124_UART2 0x1                  # write value 1  0x1               to item id 0x2091036f i
+  RAM CFG-MSGOUT-RTCM_3X_TYPE1230_UART2 0x1                  # write value 1  0x1               to item id 0x20910305 i
+Flash CFG-MSGOUT-RTCM_3X_TYPE1230_UART2 0x1                  # write value 1  0x1               to item id 0x20910305 i
+  RAM CFG-MSGOUT-RTCM_3X_TYPE4072_0_UART2 0x1                  # write value 1  0x1               to item id 0x20910300
+Flash CFG-MSGOUT-RTCM_3X_TYPE4072_0_UART2 0x1                  # write value 1  0x1               to item id 0x20910300
+
