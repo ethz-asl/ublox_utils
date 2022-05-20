@@ -40,6 +40,7 @@
           respawn_delay="$(arg respawn_delay)">
         <remap from="/rtcm" to="/ublox_position_receiver/rtcm"/>
         <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+        <param name="device" value="$(arg device_position_receiver)"/>
     </node>
 
     <!-- The second optional ublox moving baseline receiver -->
@@ -51,7 +52,7 @@
               respawn_delay="$(arg respawn_delay)">
             <remap from="/rtcm" to="/ublox_moving_baseline_receiver/rtcm"/>
             <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
-            <param name="publish/nav/relposned" value="true"/>
+            <param name="device" value="$(arg device_moving_baseline_receiver)"/>
             <param name="publish/nav/heading" value="true"/>
         </node>
     </group>
