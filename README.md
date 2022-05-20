@@ -43,7 +43,7 @@ The following considerations should be taken into account:
 - **Omnidirectional helical antennas** preferable over patch antennas as they do not require ground plane and have a better attitude coverage (see [ZED-FP9 Moving base applications, p.8](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf)).. 
 - **Multi-band antennas** that support all receiver frequencies with well-defined phase center and small phase center variation (see for example [HC882 Dual-Band Helical Antenna + L-Band](https://www.tallysman.com/app/uploads/2018/03/Tallysman%C2%AE-HC882-Datasheet_March-2022.pdf)). 
 - **Known phase center position** with respect to rover body frame (see r_BP and r_BM in Figure below).
-- Moving baseline antenna **at least 20cm** distanced from moving base antenna (see [ZED-FP9 Moving base applications, p.7](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf)).
+- Rover antenna **at least 20cm** distanced from moving base antenna (see [ZED-FP9 Moving base applications, p.7](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf)).
 
 ![Hardware GNSS setup.](https://user-images.githubusercontent.com/11293852/169337168-dd9f23a8-5c68-41e9-bf57-185111bd45fb.png)
 
@@ -51,7 +51,7 @@ The following considerations should be taken into account:
 The NTRIP setup does not require a base station.
 Instead the corrections are provided by an NTRIP caster online.
 The wiring is shown in the Figure below.
-In case of a moving baseline setup correction from the moving base receiver to the moving baseline receiver will be sent via UART2.
+In case of a moving baseline setup correction from the moving base receiver to the rover will be sent via UART2.
 
 ![Electronic wiring of dual RTK setup.](https://user-images.githubusercontent.com/11293852/169337161-7a531299-0cdd-4294-901e-e4295f50c316.png)
 
@@ -86,6 +86,16 @@ The default startup with a single receiver is
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0
 ```
+The relevant ROS topics are
+```
+/ublox_position_receiver/fix
+/ublox_moving_baseline_receiver/fix_velocity
+```
+
+Additionally, you should monitor the fix status.
+```
+/ublox_position_receiver/navstatus
+```
 
 ### Dual Receivers
 At first use, setup the [firmware][#firmware].
@@ -94,6 +104,15 @@ To startup the second receiver with moving baseline estimates run
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_moving_baseline:=true device_moving_baseline_receiver:=/dev/ttyACM1
 ```
+The relevant ROS topic is
+```
+/ublox_moving_baseline_receiver/navheading
+```
+Additionally, you should monitor a valid fix flag as well as the distance between the antennas in
+```
+/ublox_moving_baseline_receiver/navrelposned
+```
+
 **Note**: You may want to find a smart way to allocate the device ID.
 
 ### NTRIP Corrections
