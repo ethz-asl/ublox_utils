@@ -29,7 +29,6 @@ cd ~
 mkdir -p catkin_ws/src
 cd catkin_ws
 catkin init
-catkin config --extend /opt/ros/noetic
 cd ~/catkin_ws/src
 git clone git@github.com:ethz-asl/ublox_utils.git
 catkin build
