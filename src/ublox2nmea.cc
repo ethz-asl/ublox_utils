@@ -61,7 +61,7 @@ void Transformer::receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navpvt_msg) 
                     lon_dir,
                     status,
                     navpvt_msg->numSV,
-                    navpvt_msg->pDOP / 0.01,
+                    navpvt_msg->pDOP / 100.0,
                     navpvt_msg->hMSL / 1000,
                     navpvt_msg->hMSL % 1000,
                     (navpvt_msg->height - navpvt_msg->hMSL) / 1000,
