@@ -5,7 +5,8 @@ Repository with ROS tools for the u-blox RTK receiver.
 1. [Installation](#installation)
 2. [Hardware Setup](#hardware-setup)  
      1. [Electronics](#electronics)
-     2. [Part List](#part-list)  
+     2. [Part List](#part-list)
+     3. [Firmware](#firmware)
 4. [ROS Sensor Launch](#ros-sensor-launch)  
      1. [Single Receiver](#single-receiver)
      2. [Dual Receivers](#dual-receivers)
@@ -67,6 +68,10 @@ For some, e.g., NTRIP corrections or Tallysman antennas research discounts may a
 |  4  |    2    | USB-C connector cable (300mm)                | CAB-15426       | digikey   | 1568-CAB-15426-ND   | CHF 4.-         | CHF 8.-         |
 |  5  |    2    | Coaxial SMA to SMA (500mm)                   | 415-0031-MM500  | digikey   | J10300-ND           | CHF 16.-        | CHF 32.-        |
 
+### Firmware
+The latest tested firmware was **1.32** on ZED-F9P receiver. 
+To update the firmware follow the [sparkfun tutorial](https://learn.sparkfun.com/tutorials/how-to-upgrade-firmware-of-a-u-blox-gnss-receiver).
+
 ## ROS Sensor Launch
 [ublox.launch](./launch/ublox.launch) provides the launch file to start the u-blox receivers ROS interface.
 
@@ -94,7 +99,7 @@ roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_mo
 ### NTRIP Corrections
 We use the [swipos-GIS/GEO](https://www.swisstopo.admin.ch/de/geodata/geoservices/swipos/swipos-dienste/swipos-gisgeo.html) caster in conjunction with the [ROS ntrip client](http://wiki.ros.org/ntrip_client).
 Our [ublox2nmea](src/ublox2nmea.cc) node makes sure the caster receives the current VRS location.
-It receives the [NavHPPOSLLH](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavHPPOSLLH.html) from the u-blox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
+It receives the [NavPVT](http://docs.ros.org/en/noetic/api/ublox_msgs/html/msg/NavPVT.html) from the u-blox receiver and outputs it as [NMEA $GPGGA sentence](http://docs.ros.org/en/api/nmea_msgs/html/msg/Sentence.html).
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_ntrip:=true ntrip_username:=YOUR_USER ntrip_password:=YOUR_PASSWORD
 ```

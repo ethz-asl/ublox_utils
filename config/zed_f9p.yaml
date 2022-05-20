@@ -1,7 +1,10 @@
 config_on_startup: false
 publish:
-  all: true
-  esf: true
+  nav:
+    status: true
+    pvt: true
+  rxm:
+    rtcm: true
 gnss:
   gps: true
   glonass: true

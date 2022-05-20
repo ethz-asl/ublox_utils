@@ -21,7 +21,7 @@
 
     <!-- NTRIP -->
     <arg name="use_ntrip" default="false"/>
-    <arg name="navhpposllh_topic" doc="The incoming navhpposllh topic." default="/ublox_position_receiver/navhpposllh"/>
+    <arg name="navpvt_topic" doc="The incoming navpvt topic." default="/ublox_position_receiver/navpvt"/>
     <arg name="nmea_topic" doc="The outgoing nmea topic." default="/ntrip_client/nmea"/>
 
     <arg name="ntrip_host" default="www.swipos.ch" />
@@ -51,16 +51,20 @@
               respawn_delay="$(arg respawn_delay)">
             <remap from="/rtcm" to="/ublox_moving_baseline_receiver/rtcm"/>
             <rosparam command="load" file="$(arg param_file_dir)/$(arg param_file_name).yaml"/>
+            <param name="publish/nav/relposned" value="true"/>
+            <param name="publish/nav/heading" value="true"/>
         </node>
     </group>
 
-    <!-- This node creaetes NMEA $GPGGA messages from u-blox navhpposllh to send to the NTRIP caster -->
+
+    <group if="$(eval arg('use_ntrip'))">
+    <!-- This node creaetes NMEA $GPGGA messages from u-blox navpvt to send to the NTRIP caster -->
     <node name="ublox2nmea" pkg="ublox_utils" type="ublox2nmea"
           output="$(arg output)"
           clear_params="$(arg clear_params)"
           respawn="$(arg respawn)"
           respawn_delay="$(arg respawn_delay)">
-        <remap from="/navhpposllh" to="$(arg navhpposllh_topic)"/>
+        <remap from="/navpvt" to="$(arg navpvt_topic)"/>
         <remap from="/nmea" to="$(arg nmea_topic)"/>
     </node>
 
@@ -89,4 +93,5 @@
         <remap from="/rtcm" to="/ntrip_client/rtcm" />
         <remap from="/nmea" to="/ntrip_client/nmea" />
     </node>
+    </group>
 </launch>
