@@ -38,7 +38,7 @@ catkin build
 This section describes the hardware setup with one or two receivers on the rover.
 The following considerations should be taken into account:
 - Optimal **sky coverage** of the antennas.
-- Antennas **far distanced** from other electronics to avoid interference (especially LiDAR and USB-C devices).
+- Antennas **far distanced** from other electronics to avoid interference (especially LiDAR and USB 3.0 devices).
 - **Omnidirectional helical antennas** preferable over patch antennas as they do not require ground plane and have a better attitude coverage (see [ZED-FP9 Moving base applications, p.8](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf)).. 
 - **Multi-band antennas** that support all receiver frequencies with well-defined phase center and small phase center variation (see for example [HC882 Dual-Band Helical Antenna + L-Band](https://www.tallysman.com/app/uploads/2018/03/Tallysman%C2%AE-HC882-Datasheet_March-2022.pdf)). 
 - **Known phase center position** with respect to rover body frame (see r_BP and r_BM in Figure below).
@@ -74,7 +74,8 @@ To update the firmware follow the [sparkfun tutorial](https://learn.sparkfun.com
 When using a dual receiver setup update the configuration of the [moving base receiver](config/moving_base.txt) and [rover receiver](config/rover.txt).
 The configuration is elaborated in [ZED-FP9 Moving base applications, p.16](https://content.u-blox.com/sites/default/files/ZED-F9P-MovingBase_AppNote_%28UBX-19009093%29.pdf).
 To flash the configuration go to u-center and select `View->Generation 9 Configuration View->Advanced Configuration->Load from file...->Send config changes`
-**Note** If you are only using a single rover, the default config is fine.
+
+**Note**: If you are only using a single rover, the default config is fine.
 
 To revert to the default config select `View->Messages view->UBX->CFG->CFG->Revert to default configuration->Send`.
 ## ROS Sensor Launch
