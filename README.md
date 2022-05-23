@@ -98,7 +98,7 @@ Additionally, you should monitor the fix status.
 ```
 
 ### Dual Receivers
-At first use, setup the [firmware][#firmware].
+At first use, setup the [firmware](#firmware).
 
 To startup the second receiver with moving baseline estimates run
 ```
