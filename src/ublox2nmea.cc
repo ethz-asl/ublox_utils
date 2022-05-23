@@ -23,6 +23,7 @@ SOFTWARE.
 #include <nmea_msgs/Sentence.h>
 #include <ros/ros.h>
 #include <ublox_msgs/NavPVT.h>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 class Transformer {
  public:
