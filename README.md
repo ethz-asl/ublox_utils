@@ -100,7 +100,7 @@ Additionally, you should monitor the fix status.
 ### Dual Receivers
 At first use, setup the [firmware](#firmware).
 
-To startup the second receiver with moving baseline estimates run
+To startup two receivers where the second receiver estimates the moving baseline run
 ```
 roslaunch ublox_utils ublox.launch device_position_receiver:=/dev/ttyACM0 use_moving_baseline:=true device_moving_baseline_receiver:=/dev/ttyACM1
 ```
