@@ -1,0 +1,29 @@
+ublox_gps_node:
+  ros__parameters:
+    # Configuration Settings for NEO-M8Q connected via serial port
+    debug: 1                    # Range 0-4 (0 means no debug statements will print)
+
+    device: /dev/ttyACM1
+    frame_id: neom8qraw
+    rate: 4.0                     # in Hz
+    nav_rate: 1                 # [# of measurement cycles], recommended 1 Hz, may
+                                # be either 5 Hz (Dual constellation) or
+                                # 8 Hz (GPS only)
+
+    dynamic_model: portable
+
+    config_on_startup: true
+
+    raw_data: true
+
+    uart1:
+      baudrate: 115200
+      
+    inf:
+      all: true                   # Whether to display all INF messages in console
+    publish:
+      all: true
+    gnss:
+      gps: true
+      glonass: true
+      galileo: true

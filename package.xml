@@ -1,26 +1,25 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
     <name>ublox_utils</name>
-    <version>1.0.0</version>
+    <version>0.0.0</version>
     <description>
-        Repository with ROS tools for the u-blox RTK receiver.
+        Convertion to ROS2 by Mario Niedermeyer: Repository with ROS tools for the u-blox RTK receiver.
     </description>
     <author>Rik Bähnemann</author>
     <maintainer email="brik@ethz.ch">Rik Bähnemann</maintainer>
 
     <license>MIT</license>
 
-    <buildtool_depend>catkin</buildtool_depend>
+    <depend>rclcpp</depend>
+    <depend>nmea_msgs</depend>
+    <depend>ublox_msgs</depend>
+    <depend>rtcm_msgs</depend>
+    <depend>mavros_msgs</depend>
+    <depend>ntrip_client</depend>
 
-    <build_depend>roscpp</build_depend>
-    <build_depend>nmea_msgs</build_depend>
-    <build_depend>ublox_msgs</build_depend>
-
-    <exec_depend>roscpp</exec_depend>
-    <exec_depend>nmea_msgs</exec_depend>
-    <exec_depend>ublox_msgs</exec_depend>
-    <exec_depend>mavros_msgs</exec_depend>
-    <exec_depend>rtcm_msgs</exec_depend>
-    <exec_depend>ntrip_client</exec_depend>
+    <export>
+        <build_type>ament_cmake</build_type>
+    </export>
 
 </package>

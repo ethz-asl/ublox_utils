@@ -1,6 +1,14 @@
 # ublox_utils
 Repository with ROS tools for the u-blox RTK receiver.
 
+## 2023-01-25 Change Note
+- Adapted ublox2nmea.cc to ROS2 (subscribers, Time!,...)
+- Converted package.xml and CMakeLists.txt
+- Converted the ROS Launch File into a ROS2 Python Launch File (pylaunch.py)
+- ublox/ublox_gps:
+  - Changed ublox config directory in launch/ublox_gps_node-launch.py (TODO figure out how to do it dynamically)
+  - Commented Lines 182 and 183 for IMU Value output of "data_type" and "data_value" in src/adr_udr_product.cpp
+
 ## Table of Contents
 1. [Installation](#installation)
 2. [Hardware Setup](#hardware-setup)  

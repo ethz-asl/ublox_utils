@@ -18,41 +18,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <rclcpp/rclcpp.hpp>
+
 #include <limits>
 
-#include <nmea_msgs/Sentence.h>
-#include <ros/ros.h>
-#include <ublox_msgs/NavPVT.h>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <nmea_msgs/msg/sentence.hpp>
+#include <ublox_msgs/msg/nav_pvt.hpp>
+#include <stdio.h>
+#include <iostream>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-class Transformer {
+
+class Transformer : public rclcpp::Node {
  public:
   Transformer();
 
  private:
-  ros::Publisher nmea_pub_;
-  ros::Subscriber navpvt_sub_;
+  rclcpp::Publisher<nmea_msgs::msg::Sentence>::SharedPtr nmea_pub_;
+  rclcpp::Subscription<ublox_msgs::msg::NavPVT>::SharedPtr navpvt_sub_;
 
-  void receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navsat_msg);
+  void receiveNavPVT(const ublox_msgs::msg::NavPVT::SharedPtr navsat_msg);
 };
 
-Transformer::Transformer() {
-  ros::NodeHandle nh;
-  navpvt_sub_ = nh.subscribe("navpvt", 1, &Transformer::receiveNavPVT, this);
-  ROS_INFO("Subscribing to NavPVT topic %s", navpvt_sub_.getTopic().c_str());
-  nmea_pub_ = nh.advertise<nmea_msgs::Sentence>("nmea", 1);
-  ROS_INFO("Advertising NMEA topic %s", nmea_pub_.getTopic().c_str());
+Transformer::Transformer() : Node("ublox2nmea") {
+  rclcpp::QoS qos(rclcpp::KeepLast(10));
+  navpvt_sub_ = this->create_subscription<ublox_msgs::msg::NavPVT>("ublox_gps_node/navpvt",1,std::bind(&Transformer::receiveNavPVT,this,std::placeholders::_1));
+  RCLCPP_INFO(this->get_logger(), "Subscribing to NavPVT topic %s", navpvt_sub_->get_topic_name());
+  nmea_pub_ = this->create_publisher<nmea_msgs::msg::Sentence>("nmea", 1);
+  RCLCPP_INFO(this->get_logger(), "Advertising NMEA topic %s", nmea_pub_->get_topic_name());
 }
 
-void Transformer::receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navpvt_msg) {
-  ROS_INFO_ONCE("Received first NavPVT message.");
+void Transformer::receiveNavPVT(const ublox_msgs::msg::NavPVT::SharedPtr navpvt_msg) {
+  RCLCPP_INFO_ONCE(this->get_logger(), "Received first NavPVT message.");
 
   char buf[255];
 
   // Time conversion
-  auto now = ros::Time::now();
-  auto time = now.toBoost().time_of_day();
-  long int deci_seconds = now.nsec / 1e7;
+  auto now = this->get_clock()->now();
+  boost::posix_time::time_duration time;
+
+  auto now_secs = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::nanoseconds(now.nanoseconds())).count();
+  // Get current time of day in hours, minutes and seconds
+  auto hour = now_secs / 3600 % 24;
+  auto min = now_secs / 60 % 60;
+  auto sec = now_secs % 60;
 
   // Lat conversion
   char lat_dir = navpvt_msg->lat < 0 ? 'S' : 'N';
@@ -65,15 +74,17 @@ void Transformer::receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navpvt_msg) 
   double lon_mins = (navpvt_msg->lon - lon_degs * 1e7) / 1e7 * 60.0;
 
   // Status conversion
-  int8_t status = (navpvt_msg->fixType == ublox_msgs::NavPVT::FIX_TYPE_3D) ? 1 : 0;
-
+  int8_t status = (navpvt_msg->fix_type == ublox_msgs::msg::NavPVT::FIX_TYPE_3D) ? 1 : 0;
+  
+  // FIXME (calculate dec_secs correctly)
+  long int dec_secs = 24;
   uint8_t
       len = sprintf(buf,
                     "$GPGGA,%02ld%02ld%02ld.%ld,%02d%08.5f,%c,%03d%08.5f,%c,%d,%d,%.1f,%d.%d,M,%d.%d,M,,",
-                    time.hours(),
-                    time.minutes(),
-                    time.seconds(),
-                    deci_seconds,
+                    (int64_t)hour,
+                    (int64_t)min,
+                    (int64_t)sec,
+                    dec_secs,
                     lat_degs,
                     lat_mins,
                     lat_dir,
@@ -81,13 +92,18 @@ void Transformer::receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navpvt_msg) 
                     lon_mins,
                     lon_dir,
                     status,
-                    navpvt_msg->numSV,
-                    navpvt_msg->pDOP / 100.0,
-                    navpvt_msg->hMSL / 1000,
-                    navpvt_msg->hMSL % 1000,
-                    (navpvt_msg->height - navpvt_msg->hMSL) / 1000,
-                    std::abs((navpvt_msg->height - navpvt_msg->hMSL)) % 1000
+                    navpvt_msg->num_sv,
+                    navpvt_msg->p_dop / 100.0,
+                    navpvt_msg->h_msl / 1000,
+                    navpvt_msg->h_msl % 1000,
+                    (navpvt_msg->height - navpvt_msg->h_msl) / 1000,
+                    std::abs((navpvt_msg->height - navpvt_msg->h_msl)) % 1000
   );
+
+// RCLCPP_INFO_STREAM(get_logger(),"hours: "<< hour);
+// RCLCPP_INFO_STREAM(get_logger(),"minutes: "<< min);
+// RCLCPP_INFO_STREAM(get_logger(),"seconds: "<< sec);
+
   // Calculate checksum of sentence and add it to the end of the sentence
   uint8_t checksum = 0;
   for (int i = 1; i < len; i++) {
@@ -95,18 +111,18 @@ void Transformer::receiveNavPVT(const ublox_msgs::NavPVT::ConstPtr &navpvt_msg) 
   }
   sprintf(&buf[len], "*%02X\r\n", checksum);
 
-  nmea_msgs::Sentence nmea_msg;
+  nmea_msgs::msg::Sentence nmea_msg;
   nmea_msg.header.stamp = now;
   nmea_msg.header.frame_id = "gps";
   nmea_msg.sentence = buf;
-  nmea_pub_.publish(nmea_msg);
+  //RCLCPP_DEBUG(this->get_logger(), nmea_msg);
+  nmea_pub_->publish(nmea_msg);
 }
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "ublox2nmea");
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<Transformer>());
+  rclcpp::shutdown();
 
-  Transformer transformer;
-
-  ros::spin();
   return 0;
 }

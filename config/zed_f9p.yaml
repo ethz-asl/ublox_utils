@@ -1,15 +1,33 @@
-config_on_startup: false
-publish:
-  nav:
-    relposned: true
-    status: true
-    pvt: true
-  rxm:
-    rtcm: true
-gnss:
-  gps: true
-  glonass: true
-  galileo: true
-  beidou: true
-dynamic_model: airborne1
-debug: 0
+ublox_gps_node:
+  ros__parameters:
+    uart1:
+      baudrate: 115200
+    config_on_startup: false
+    inf:
+      all: true                   # Whether to display all INF messages in console
+        
+    publish:
+      all: true
+      # nav:
+      #   relposned: true
+      #   status: true
+      #   pvt: true
+      # rxm:
+      #   rtcm: true
+      # sensor_msgs:
+      #   imu: true
+    gnss:
+      gps: true
+      glonass: true
+      galileo: true
+      beidou: false
+    dynamic_model: automotive
+    nmea:
+      high_prec: true
+    #debug: 0
+    nav_rate: 3
+    rate: 1.0
+    dr_limit: 0
+
+    #TODO trotz config_on_startup: false ändern sich die Topics bei Änderung von publish:all:true
+    # gnss oder rates ändern sich jedoch nicht
